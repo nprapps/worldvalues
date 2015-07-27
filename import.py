@@ -1,59 +1,50 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 
 import csv
+import dataset
 
-with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
+POSTGRES_URL = 'postgresql:///worldvalues'
+db = dataset.connect(POSTGRES_URL)
 
-    reader = csv.DictReader(f)    
-    for row in reader:
-        print row['V3']
+def load_data():
+    with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
+        reader = csv.DictReader(f)
 
-#V12-V22. what qualities do you encourage in your children?
+        for row in reader:
+            print row['V3']
 
-# V45. When jobs are scarce, men should have more right to a job than women.
+def load_codebook():
+    codebook_table = db['codebook']
+    category_table = db['categories']
+    with open('data/codebook.csv') as f:
+        rows = list(csv.DictReader(f))
 
-# V47. If a woman earns more money than her husband, it's almost certain to cause problems
+    for row in rows:
+        question = {
+            'question': row['QUESTION'],
+            'label': row['LABEL'],
+            'question_id': row['VAR'],
+        }
+        question_id = codebook_table.insert(question)
 
-# V48. Having a job is the best way for a woman to be an independent person.
+        categories = row['CATEGORIES'].splitlines()
+        for category in categories:
+            try:
+                code, middle_value, real_value = category.split('#')
+            except ValueError:
+                print 'skipped {0} due to country specific code'.format(row['VAR'])
+            category_row = {
+                'question_id': question_id,
+                'code': code,
+                'value': real_value,
+            }
+            category_table.insert(category_row)
 
-# V50. When a mother works for pay, the children suffer.
 
-# V51. On the whole, men make better political leaders than women do.
+        # categories = row['CATEGORY'].split('???')
+        # for category in categories:
+        #    more splitting
+        #    write to db row
 
-# V52. A university education is more important for a boy than for a girl.
-
-# V53. On the whole, men make better business executives than women do.
-
-# V54. Being a housewife is just as fulfilling as working for pay
-
-# V80. I¹m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole? (Discrimination against girls and women)
-
-# V123. I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: (Women¹s organizations)
-
-# V139. Please tell me for each of the following things how essential you think it is as a characteristic of democracy. (Women have the same rights as men.)
-
-# V168. Companies that employ young people perform better than those that employ people of different ages.
-
-# V182. To what degree are you worried about the following situations? (Not being able to give my children a good education)
-
-# V203A. Prostitution
-
-# V204. Abortion
-
-# V205. Divorce
-
-# V206. Sex before marriage
-
-# V207. Suicide
-
-# V208. For a man to beat his wife
-
-# V209. Parents beating children
-
-# V240. Sex of respondent
-
-# V241. Respondent's birth year.
-
-# V242. Age
-
-# V250. Do you live with your parents?
+if __name__ == '__main__':
+    load_codebook()

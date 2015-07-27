@@ -1,3 +1,6 @@
+_unnamed,_unnamed_2,_unnamed_3,CODEBOOK,_unnamed_4,_unnamed_5,_unnamed_6
+,,,World Values Survey Wave 6 (2010-2014) v.2014.11.07,,,
+,,,,,,
 ,VAR,LABEL,QUESTION,LENGTH,FILTER,CATEGORIES
 ,V1,Wave,Wave number,2,,"1##1981-1984
 2##1989-1993
