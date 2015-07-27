@@ -40,11 +40,5 @@ def load_codebook():
             }
             category_table.insert(category_row)
 
-
-        # categories = row['CATEGORY'].split('???')
-        # for category in categories:
-        #    more splitting
-        #    write to db row
-
 if __name__ == '__main__':
     load_codebook()
