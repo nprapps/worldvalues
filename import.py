@@ -3,16 +3,42 @@
 import csv
 import dataset
 from collections import OrderedDict
+from joblib import Parallel, delayed
 
 POSTGRES_URL = 'postgresql:///worldvalues'
 db = dataset.connect(POSTGRES_URL)
 
+
 def load_data():
+    table = db['survey_responses']
+    data = []
+
     with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
+        print "build data"
         reader = csv.DictReader(f)
 
         for row in reader:
-            print row['V3']
+            del row['']
+            data.append(row)
+
+    print "insert data"
+    table.insert_many(data, 5000)
+
+# Parallel version
+#def load_data():
+    #table = db['survey_responses']
+    #data = []
+
+    #with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
+        #print "build data"
+        #raw_data = list(csv.DictReader(f))
+
+        #Parallel(n_jobs=8, backend='threading')(delayed(_process_row)(table, row) for row in raw_data)
+
+
+#def _process_row(table, row):
+    #del row['']
+    #table.insert(row)
 
 def load_codebook():
     codebook_table = db['codebook']
@@ -42,5 +68,7 @@ def load_codebook():
             ))
             category_table.insert(category_row)
 
+
 if __name__ == '__main__':
-    load_codebook()
+    #load_codebook()
+    load_data()
