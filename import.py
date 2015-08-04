@@ -2,6 +2,7 @@
 
 import csv
 import dataset
+from collections import OrderedDict
 
 POSTGRES_URL = 'postgresql:///worldvalues'
 db = dataset.connect(POSTGRES_URL)
@@ -20,11 +21,11 @@ def load_codebook():
         rows = list(csv.DictReader(f))
 
     for row in rows:
-        question = {
-            'question': row['QUESTION'],
-            'label': row['LABEL'],
-            'question_id': row['VAR'],
-        }
+        question = OrderedDict((
+            ('question_id', row['VAR']),
+            ('question', row['QUESTION']),
+            ('label', row['LABEL']),
+        ))
         db_id = codebook_table.insert(question)
 
         categories = row['CATEGORIES'].splitlines()
@@ -33,12 +34,12 @@ def load_codebook():
                 code, middle_value, real_value = category.split('#')
             except ValueError:
                 print 'skipped {0} due to country specific code'.format(row['VAR'])
-            category_row = {
-                'question_id': row['VAR'],
-                'db_id': db_id,
-                'code': code,
-                'value': real_value,
-            }
+            category_row = OrderedDict((
+                ('db_id', db_id),
+                ('question_id', row['VAR']),
+                ('code', code),
+                ('value', real_value),
+            ))
             category_table.insert(category_row)
 
 if __name__ == '__main__':
