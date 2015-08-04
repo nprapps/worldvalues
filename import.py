@@ -25,7 +25,7 @@ def load_codebook():
             'label': row['LABEL'],
             'question_id': row['VAR'],
         }
-        question_id = codebook_table.insert(question)
+        db_id = codebook_table.insert(question)
 
         categories = row['CATEGORIES'].splitlines()
         for category in categories:
@@ -34,7 +34,8 @@ def load_codebook():
             except ValueError:
                 print 'skipped {0} due to country specific code'.format(row['VAR'])
             category_row = {
-                'question_id': question_id,
+                'question_id': row['VAR'],
+                'db_id': db_id,
                 'code': code,
                 'value': real_value,
             }
