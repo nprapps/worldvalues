@@ -3,7 +3,6 @@
 import csv
 import dataset
 from collections import OrderedDict
-from joblib import Parallel, delayed
 
 POSTGRES_URL = 'postgresql:///worldvalues'
 db = dataset.connect(POSTGRES_URL)
@@ -11,30 +10,30 @@ db = dataset.connect(POSTGRES_URL)
 
 def load_data():
     table = db['survey_responses']
+    data = []
+    schema_created = False
 
     with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
         print "build data"
-        reader = csv.DictReader(f)
+        reader = csv.reader(f)
+        headers = reader.next()
 
         for row in reader:
-            del row['']
-            table.insert(row)
+            data.append(row)
 
-# Parallel version
-#def load_data():
-    #table = db['survey_responses']
-    #data = []
+            if not schema_created:
+                schema_created = True
+                processed_row = []
+                for column in row[1:]:
+                    processed_row.append(str(column))
+                processed_dict = OrderedDict(zip(headers[1:], processed_row))
+                table.insert(processed_dict)
+                db.query('delete from survey_responses')
 
-    #with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
-        #print "build data"
-        #raw_data = list(csv.DictReader(f))
+    with open('data/WV6_Data_r_v_2015_04_18-clean.csv', 'w') as f:
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+        writer.writerows(data)
 
-        #Parallel(n_jobs=8, backend='threading')(delayed(_process_row)(table, row) for row in raw_data)
-
-
-#def _process_row(table, row):
-    #del row['']
-    #table.insert(row)
 
 def load_codebook():
     codebook_table = db['codebook']
@@ -59,12 +58,12 @@ def load_codebook():
             category_row = OrderedDict((
                 ('db_id', db_id),
                 ('question_id', row['VAR']),
-                ('code', code),
-                ('value', real_value),
+                ('code', str(code)),
+                ('value', str(real_value)),
             ))
             category_table.insert(category_row)
 
 
 if __name__ == '__main__':
-    #load_codebook()
+    load_codebook()
     load_data()
