@@ -16,7 +16,11 @@ def load_data():
     with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
         print "build data"
         reader = csv.reader(f)
-        headers = reader.next()
+        raw_headers = reader.next()
+
+        headers = []
+        for header in raw_headers[1:]:
+            headers.append(header.lower())
 
         for row in reader:
             data.append(row)
@@ -26,7 +30,7 @@ def load_data():
                 processed_row = []
                 for column in row[1:]:
                     processed_row.append(str(column))
-                processed_dict = OrderedDict(zip(headers[1:], processed_row))
+                processed_dict = OrderedDict(zip(headers, processed_row))
                 table.insert(processed_dict)
                 db.query('delete from survey_responses')
 
@@ -43,7 +47,7 @@ def load_codebook():
 
     for row in rows:
         question = OrderedDict((
-            ('question_id', row['VAR']),
+            ('question_id', row['VAR'].lower()),
             ('question', row['QUESTION']),
             ('label', row['LABEL']),
         ))
@@ -57,7 +61,7 @@ def load_codebook():
                 print 'skipped {0} due to country specific code'.format(row['VAR'])
             category_row = OrderedDict((
                 ('db_id', db_id),
-                ('question_id', row['VAR']),
+                ('question_id', row['VAR'].lower()),
                 ('code', str(code)),
                 ('value', str(real_value)),
             ))
