@@ -37,8 +37,18 @@ def summarize(question_id):
 
         counts[row["country"]][row["response"]] += 1
 
-    print counts
+    output = []
+    for country, values in counts.items():
+        output_row = OrderedDict((('country', country),))
+        total = 0
+        for label, value in values.items():
+            total += int(value)
+        for label, value in values.items():
+            output_row[label] = float(value) / total
 
+        output.append(output_row)
+
+    dataset.freeze(output, format='csv', filename='output/{0}.csv'.format(question_id))
 
 if __name__ == '__main__':
     summarize('v54')
