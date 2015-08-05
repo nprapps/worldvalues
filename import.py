@@ -11,7 +11,6 @@ db = dataset.connect(POSTGRES_URL)
 
 def load_data():
     table = db['survey_responses']
-    data = []
 
     with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
         print "build data"
@@ -19,10 +18,7 @@ def load_data():
 
         for row in reader:
             del row['']
-            data.append(row)
-
-    print "insert data"
-    table.insert_many(data, 5000)
+            table.insert(row)
 
 # Parallel version
 #def load_data():
