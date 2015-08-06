@@ -43,8 +43,13 @@ def summarize(question_id):
         total = 0
         for label, value in values.items():
             total += int(value)
+
+        output_row['total_responses'] = total
+
         for label, value in values.items():
-            output_row[label] = float(value) / total
+            output_row[label] = value
+            pct_label = '{0} pct'.format(label.encode('ascii', 'ignore').decode('ascii'))
+            output_row[pct_label] = float(value) / total
 
         output.append(output_row)
 
