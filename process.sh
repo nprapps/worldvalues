@@ -14,5 +14,6 @@ echo "Import World Values data"
 echo "psql copy"
 psql worldvalues -c "COPY survey_responses FROM '`pwd`/data/WV6_Data_r_v_2015_04_18-clean.csv' DELIMITER ',' CSV;"
 
-
+echo "Summarize World Values"
+./summarize.py
 
