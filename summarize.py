@@ -89,7 +89,7 @@ def _get_counts(result, question_id):
 
 def process_mentioned(question, result, countries):
     counts = _get_counts(result, question['question_id'])
-    key = '{0} (% mentioned)'.format(question['question_id'])
+    key = '{0} {1} (% mentioned)'.format(question['question_id'], question['label'])
 
     for country, data in countries.items():
         data[key] = None
@@ -104,7 +104,7 @@ def process_mentioned(question, result, countries):
 
 def process_agree_3way(question, result, countries):
     counts = _get_counts(result, question['question_id'])
-    key = '{0} (% agree)'.format(question['question_id'])
+    key = '{0} {1} (% agree)'.format(question['question_id'], question['label'])
 
     for country, data in countries.items():
         data[key] = None
@@ -119,7 +119,7 @@ def process_agree_3way(question, result, countries):
 
 def process_agree_4way(question, result, countries):
     counts = _get_counts(result, question['question_id'])
-    key = '{0} (% agree strongly and agree)'.format(question['question_id'])
+    key = '{0} {1} (% agree strongly and agree)'.format(question['question_id'], question['label'])
 
     for country, data in countries.items():
         data[key] = None
@@ -134,7 +134,7 @@ def process_agree_4way(question, result, countries):
 
 def process_likert(question, result, countries):
     counts = _get_counts(result, question['question_id'])
-    key = '{0} (% favorable [#5-#10])'.format(question['question_id'])
+    key = '{0} {1} (% favorable [#5-#10])'.format(question['question_id'], question['label'])
 
     for country, data in countries.items():
         data[key] = None
