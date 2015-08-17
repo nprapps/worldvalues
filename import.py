@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import csv
 import dataset
@@ -7,6 +8,25 @@ from collections import OrderedDict
 POSTGRES_URL = 'postgresql:///worldvalues'
 db = dataset.connect(POSTGRES_URL)
 
+QUESTION_TYPES = (
+    ('mentioned', """1##Mentioned
+2##Not mentioned"""),
+    ('agree_3way', """1##Agree
+2##Neither
+3##Disagree"""),
+    ('agree_4way', """1##Agree strongly
+2##Agree
+3##Disagree
+4##Strongly disagree"""),
+    ('likert', """2##2
+3##3
+4##4
+5##5
+6##6
+7##7
+8##8
+9##9"""),
+)
 
 def load_data():
     table = db['survey_responses']
@@ -46,10 +66,17 @@ def load_codebook():
         rows = list(csv.DictReader(f))
 
     for row in rows:
+        question_type = None
+        for potential_question_type, categories in QUESTION_TYPES:
+            if categories in row['CATEGORIES']:
+                question_type = potential_question_type
+                break
+
         question = OrderedDict((
             ('question_id', row['VAR'].lower()),
             ('question', row['QUESTION']),
             ('label', row['LABEL']),
+            ('question_type', question_type),
         ))
         db_id = codebook_table.insert(question)
 

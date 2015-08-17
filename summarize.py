@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 import dataset
 
 POSTGRES_URL = 'postgresql:///worldvalues'
@@ -24,10 +25,10 @@ def initialize_counts(question_id):
 
     return category_counts
 
-def summarize(question_id):
+
+def _query(question_id):
     table = db['codebook']
     question = table.find_one(question_id=question_id)
-    print '{0}: {1}'.format(question_id, question['label'])
 
     result = db.query("""
         select
@@ -42,6 +43,13 @@ def summarize(question_id):
             country
         ;
     """.format(question_id))
+
+    return question, list(result)
+
+
+def summarize(question_id):
+    question, result = _query(question_id)
+    print '{0}: {1}'.format(question_id, question['label'])
 
     counts = OrderedDict()
 
@@ -70,6 +78,105 @@ def summarize(question_id):
     dataset.freeze(output, format='csv', filename='output/{0}.csv'.format(question_id))
 
 
+def _get_counts(result, question_id):
+    counts = OrderedDict()
+    for row in result:
+        if not row['country'] in counts.keys():
+            counts[row['country']] = initialize_counts(question_id)
+        counts[row["country"]][row["response"]] += 1
+    return counts
+
+
+def process_mentioned(question, result, countries):
+    counts = _get_counts(result, question['question_id'])
+    key = '{0} (% mentioned)'.format(question['question_id'])
+
+    for country, data in countries.items():
+        data[key] = None
+
+    total = 0
+    for country, results in counts.items():
+        for count in results.values():
+            total += count
+
+        countries[country][key] = float(results['Mentioned']) / float(total)
+
+
+def process_agree_3way(question, result, countries):
+    counts = _get_counts(result, question['question_id'])
+    key = '{0} (% agree)'.format(question['question_id'])
+
+    for country, data in countries.items():
+        data[key] = None
+
+    total = 0
+    for country, results in counts.items():
+        for count in results.values():
+            total += count
+
+        countries[country][key] = float(results['Agree']) / float(total)
+
+
+def process_agree_4way(question, result, countries):
+    counts = _get_counts(result, question['question_id'])
+    key = '{0} (% agree strongly and agree)'.format(question['question_id'])
+
+    for country, data in countries.items():
+        data[key] = None
+
+    total = 0
+    for country, results in counts.items():
+        for count in results.values():
+            total += count
+
+        countries[country][key] = (float(results['Agree']) + float(results['Agree strongly'])) / float(total)
+
+
+def process_likert(question, result, countries):
+    counts = _get_counts(result, question['question_id'])
+    key = '{0} (% favorable [#5-#10])'.format(question['question_id'])
+
+    for country, data in countries.items():
+        data[key] = None
+
+    total = 0
+    for country, results in counts.items():
+        for count in results.values():
+            total += count
+
+        favorable = sum(results.values()[5:10])
+
+        countries[country][key] = float(favorable) / float(total)
+
+
+def compressed_summarize():
+    table = db['categories']
+    country_result = list(table.find(question_id='v2a'))
+    countries = OrderedDict()
+    for row in country_result:
+        countries[row['value']] = OrderedDict((('country', row['value']),))
+
+    for question_id in ANALYSIS_QUESTIONS:
+        question, result = _query(question_id)
+
+        if question['question_type'] == 'mentioned':
+            process_mentioned(question, result, countries)
+
+        if question['question_type'] == 'agree_3way':
+            process_agree_3way(question, result, countries)
+
+        if question['question_type'] == 'agree_4way':
+            process_agree_4way(question, result, countries)
+
+        if question['question_type'] == 'likert':
+            process_likert(question, result, countries)
+
+    dataset.freeze(countries.values(), format='csv', filename='output/summary.csv')
+
+
 if __name__ == '__main__':
+    compressed_summarize()
+
     for question_id in ANALYSIS_QUESTIONS:
         summarize(question_id)
+
