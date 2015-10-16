@@ -106,7 +106,7 @@ def summarize_agreement():
     countries = OrderedDict()
     for country in country_list:
         if country in ANALYSIS_COUNTRIES:
-            countries[country] = OrderedDict(('country', country))
+            countries[country] = OrderedDict((('country', country),))
 
     for question_id in ANALYSIS_QUESTIONS:
         question, result = query(question_id)
