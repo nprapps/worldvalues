@@ -1,0 +1,55 @@
+# World Values Data parser
+
+A data processing rig for the [World Values Survey](http://www.worldvaluessurvey.org/wvs.jsp). Currently tested only with WVS Wave 6 (2010-2014).
+
+# System requirements
+
+* bash
+* Python
+* PostgreSQL
+
+Have a Mac and need help getting the requirements installed? [Read our guide](http://blog.apps.npr.org/2013/06/06/how-to-setup-a-developers-environment.html)!
+
+# Installation
+
+Install project requirements (preferably in a virtualenv):
+
+```
+pip install -r requirements.txt
+```
+
+# What's in here?
+
+# Processing all the data
+
+To import the data and summarize it the way we do, run:
+
+```
+./process.sh
+```
+
+This will generate summary output for all the questions NPR analyzed in our reporting.
+
+# Import the data and process yourself
+
+First, run the importer:
+
+```
+./import.sh
+```
+
+Now, you can create summaries for individual questions by calling:
+
+```
+./summarize.py <question_id>
+```
+
+So if you were interested in the responses per-country to question v52 (*"A university education is more important for a boy than for a girl."*), you would run:
+
+```
+./summarize.py v52
+```
+
+
+
+
