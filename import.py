@@ -28,35 +28,55 @@ QUESTION_TYPES = (
 9##9"""),
 )
 
-def load_data():
-    table = db['survey_responses']
-    data = []
+
+def clean_data():
+    """
+    Clean data and create schema
+    """
+
     schema_created = False
 
-    with open('data/WV6_Data_r_v_2015_04_18.csv') as f:
-        print "build data"
-        reader = csv.reader(f)
-        raw_headers = reader.next()
+    cleaned_file = open('data/WV6_Data_ascii_v_2015_04_18-clean.csv', 'w')
+    writer = csv.writer(cleaned_file, quoting=csv.QUOTE_ALL)
 
-        headers = []
-        for header in raw_headers[1:]:
-            headers.append(header.lower())
+    input_file = open('data/WV6_Data_ascii_v_2015_04_18.dat')
+    reader = csv.reader(input_file)
 
-        for row in reader:
-            data.append(row)
+    raw_headers = reader.next()
 
-            if not schema_created:
-                schema_created = True
-                processed_row = []
-                for column in row[1:]:
-                    processed_row.append(str(column))
-                processed_dict = OrderedDict(zip(headers, processed_row))
-                table.insert(processed_dict)
-                db.query('delete from survey_responses')
+    # Process rows
+    for row in reader:
+        # Add row to cleaned CSV
+        writer.writerow(row)
 
-    with open('data/WV6_Data_r_v_2015_04_18-clean.csv', 'w') as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-        writer.writerows(data)
+        # Create database schema from first row
+        if not schema_created:
+            create_schema(row, raw_headers)
+            schema_created = True
+
+
+def create_schema(row, raw_headers):
+    """
+    Create schema from a single row of data
+    """
+    table = db['survey_responses']
+
+    # Clean headers
+    headers = []
+    for header in raw_headers[1:]:
+        headers.append(header.lower())
+
+    # Clean row
+    processed_row = []
+    for column in row[1:]:
+        processed_row.append(str(column))
+
+    # Insert row into tabel
+    processed_dict = OrderedDict(zip(headers, processed_row))
+    table.insert(processed_dict)
+
+    # Clear out table
+    db.query('delete from survey_responses')
 
 
 def load_codebook():
@@ -97,4 +117,4 @@ def load_codebook():
 
 if __name__ == '__main__':
     load_codebook()
-    load_data()
+    clean_data()

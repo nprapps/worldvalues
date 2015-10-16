@@ -1,3 +1,7 @@
 .DS_Store
+data/codebook_raw.csv
+data/codebook.csv
+data/WV6_Data_ascii_v_2015_04_18.dat
+data/WV6_Data_ascii_v_2015_04_18-clean.csv
 output/*
 *.pyc

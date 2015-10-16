@@ -12,4 +12,4 @@ echo "Set up tables and import codebook"
 ./import.py
 
 echo "Import all the data"
-psql worldvalues -c "COPY survey_responses FROM '`pwd`/data/WV6_Data_r_v_2015_04_18-clean.csv' DELIMITER ',' CSV;"
+psql worldvalues -c "COPY survey_responses FROM '`pwd`/data/WV6_Data_ascii_v_2015_04_18-clean.csv' DELIMITER ',' CSV;"

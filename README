@@ -18,6 +18,10 @@ Install project requirements (preferably in a virtualenv):
 pip install -r requirements.txt
 ```
 
+## Download the data
+
+The data cannot be redistributed, so you'll have to go [download it](http://www.worldvaluessurvey.org/WVSDocumentationWV6.jsp). Follow the *WV6_Data_ascii_delimited_v_2015_04_18 (delimited with comma)* link, unzip the file, and copy `WV6_Data_ascii_v_2015_04_18.dat` into this projects `data` folder.
+
 # What's in here?
 
 # Processing all the data
