@@ -45,9 +45,12 @@ def clean_data():
     raw_headers = reader.next()
 
     # Process rows
+    id = 1
     for row in reader:
         # Add row to cleaned CSV
+        row.insert(0, id)
         writer.writerow(row)
+        id += 1
 
         # Create database schema from first row
         if not schema_created:
@@ -61,10 +64,10 @@ def create_schema(row, raw_headers):
     """
     table = db['survey_responses']
 
-    # Clean headers
-    headers = []
-    for header in raw_headers[1:]:
-        headers.append(header.lower())
+    # Get pre-cached headers
+    with open('data/headers.csv') as f:
+        reader = csv.reader(f)
+        headers = reader.next()
 
     # Clean row
     processed_row = []
