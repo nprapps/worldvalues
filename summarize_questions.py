@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import dataset
+import sys
 
 from collections import OrderedDict
 from db import query, initialize_counts
@@ -51,5 +52,10 @@ def summarize_question(question_id):
     dataset.freeze(output, format='csv', filename='output/{0}.csv'.format(question_id))
 
 if __name__ == '__main__':
-    for question_id in ANALYSIS_QUESTIONS:
+    if len(sys.argv) > 1:
+        questions = sys.argv[1:]
+    else:
+        questions = ANALYSIS_QUESTIONS
+
+    for question_id in questions:
         summarize_question(question_id)
