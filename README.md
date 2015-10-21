@@ -6,7 +6,7 @@ Have a Mac and need help getting the requirements installed? [Read our guide](ht
 
 # Installation
 
-# System requirements
+## System requirements
 
 * bash
 * Python + pip
