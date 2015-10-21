@@ -25,8 +25,6 @@ pip install -r requirements.txt
 
 The data cannot be redistributed, so you'll have to go [download it](http://www.worldvaluessurvey.org/WVSDocumentationWV6.jsp). Follow the *WV6_Data_ascii_delimited_v_2015_04_18 (delimited with comma)* link, unzip the file, and copy `WV6_Data_ascii_v_2015_04_18.dat` into this projects `data` folder.
 
-# What's in here?
-
 # Processing all the data
 
 To import the data and summarize it the way we do, run:
@@ -56,6 +54,8 @@ So if you were interested in the responses per-country to question v52 (*"A univ
 ```
 ./summarize_questions.py v52
 ```
+
+The summary output will be in `output/v52.csv`.
 
 You can pass multiple questions, just separate them with space:
 
