@@ -33,7 +33,7 @@ To import the data and summarize it the way we do, run:
 ./process.sh
 ```
 
-This will generate summary output for all the questions NPR analyzed in our reporting.
+This will generate summary output for all the questions NPR analyzed in our reporting. The output will go in the `output` directory in CSV format.
 
 # Import the data and process yourself
 
